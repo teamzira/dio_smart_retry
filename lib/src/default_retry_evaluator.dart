@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 
@@ -20,8 +21,9 @@ class DefaultRetryEvaluator {
         shouldRetry = true;
       }
     } else {
-      shouldRetry =
-          error.type != DioErrorType.cancel && error.error is! FormatException;
+      shouldRetry = (error.error is SocketException) ||
+          (error.type != DioErrorType.cancel &&
+              error.error is! FormatException);
     }
     return shouldRetry;
   }
