@@ -114,6 +114,8 @@ const defaultRetryableStatuses = <int>{
   status527RailgunError,
 };
 
+const defaultRetryDisableStatues = <int>{};
+
 // For backward compatibility purpose
 @Deprecated('Use [defaultRetryableStatuses]')
 const retryableStatuses = defaultRetryableStatuses;

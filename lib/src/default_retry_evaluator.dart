@@ -4,9 +4,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 class DefaultRetryEvaluator {
-  DefaultRetryEvaluator(this._retryableStatuses);
+  DefaultRetryEvaluator(this._retryableStatuses, this._retryDisableStatuses);
 
   final Set<int> _retryableStatuses;
+  final Set<int> _retryDisableStatuses;
 
   /// Returns true only if the response hasn't been cancelled
   ///   or got a bad status code.
@@ -28,5 +29,7 @@ class DefaultRetryEvaluator {
     return shouldRetry;
   }
 
-  bool isRetryable(int statusCode) => _retryableStatuses.contains(statusCode);
+  bool isRetryable(int statusCode) =>
+      _retryableStatuses.contains(statusCode) &&
+      !_retryDisableStatuses.contains(statusCode);
 }

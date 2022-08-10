@@ -21,11 +21,18 @@ class RetryInterceptor extends Interceptor {
     RetryEvaluator? retryEvaluator,
     this.ignoreRetryEvaluatorExceptions = false,
     this.retryableExtraStatuses = const {},
+    this.retryDisabledStatuses = const {},
   }) : _retryEvaluator = retryEvaluator ??
-            DefaultRetryEvaluator({
-              ...defaultRetryableStatuses,
-              ...retryableExtraStatuses,
-            }).evaluate {
+            DefaultRetryEvaluator(
+              {
+                ...defaultRetryableStatuses,
+                ...retryableExtraStatuses,
+              },
+              {
+                ...defaultRetryDisableStatues,
+                ...retryDisabledStatuses,
+              },
+            ).evaluate {
     if (retryEvaluator != null && retryableExtraStatuses.isNotEmpty) {
       throw ArgumentError(
         '[retryableExtraStatuses] works only if [retryEvaluator] is null.'
@@ -70,11 +77,17 @@ class RetryInterceptor extends Interceptor {
   /// IMPORTANT: THIS SETTING WORKS ONLY IF [_retryEvaluator] is null
   final Set<int> retryableExtraStatuses;
 
+  /// Specifies a disabled retryable statuses,
+  ///  which will be taken into account with [defaultRetryableStatuses]
+  final Set<int> retryDisabledStatuses;
+
   /// Redirects to [DefaultRetryEvaluator.evaluate]
-  ///   with [defaultRetryableStatuses]
+  ///   with [defaultRetryableStatuses] and [defaultRetryDisableStatues]
   static final FutureOr<bool> Function(DioError error, int attempt)
-      defaultRetryEvaluator =
-      DefaultRetryEvaluator(defaultRetryableStatuses).evaluate;
+      defaultRetryEvaluator = DefaultRetryEvaluator(
+    defaultRetryableStatuses,
+    defaultRetryDisableStatues,
+  ).evaluate;
 
   Future<bool> _shouldRetry(DioError error, int attempt) async {
     try {
